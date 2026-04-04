@@ -19,6 +19,7 @@ export const Footer = ({ company }) => (
         </div>
         <div>
           <h4 className="text-white font-bold mb-6 uppercase tracking-wider border-b border-gray-800 pb-2 inline-block">Redes Sociales</h4>
+          <p className="text-sm text-gray-400 mb-6">Síguenos para conocer nuestros últimos proyectos y cursos disponibles.</p>
           <div className="flex gap-4">
             <a href="https://www.facebook.com/profile.php?id=61584070753728" className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-yellow-500 hover:text-black">
               <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>

@@ -12,15 +12,37 @@ import { Footer } from './components/layout/Footer.jsx';
 // Importación de Páginas
 import { Home } from './pages/Home.jsx';
 import { Quote } from './pages/Quote.jsx';
-import { AcademyLogin } from './pages/AcademyLogin.jsx';
+// import { AcademyLogin } from './pages/AcademyLogin.jsx'; // COMENTADO TEMPORALMENTE
 import { Academy } from './pages/Academy.jsx';
 import { Quiz } from './pages/Quiz.jsx';
 import { Login } from './pages/Login.jsx';
-import { Dashboard } from './pages/Dashboard.jsx';
+import { DashboardLayout } from './pages/dashboard/DashboardLayout.jsx';
+import { DashboardHome } from './pages/dashboard/DashboardHome.jsx';
+import { QuotesPending } from './pages/dashboard/QuotesPending.jsx';
+import { QuotesSent } from './pages/dashboard/QuotesSent.jsx';
+import { AcademyCourses } from './pages/dashboard/AcademyCourses.jsx';
+import { AcademyStudents } from './pages/dashboard/AcademyStudents.jsx';
+import { AcademyEvaluations } from './pages/dashboard/AcademyEvaluations.jsx';
+
+const ProtectedRoute = ({ isAllowed, redirectPath = '/login', children }) => {
+  if (!isAllowed) {
+    return <Navigate to={redirectPath} replace />;
+  }
+  return children;
+};
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Para el Admin
-  const [isAcademyAuthenticated, setIsAcademyAuthenticated] = useState(false); // Para el Estudiante
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isAuthenticated', isAuthenticated ? 'true' : 'false');
+    }
+  }, [isAuthenticated]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [appData, setAppData] = useState(null);
 
@@ -55,24 +77,34 @@ export default function App() {
             <Route path="/quote" element={<Quote />} />
             
             {/* Rutas de Login */}
-            <Route path="/academy-login" element={<AcademyLogin setIsAcademyAuthenticated={setIsAcademyAuthenticated} />} />
-            <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-            
+            <Route
+              path="/login"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Login setIsAuthenticated={setIsAuthenticated} />
+                )
+              }
+            />
             {/* Rutas Protegidas: Estudiantes de Academia */}
-            <Route 
-              path="/academy" 
-              element={isAcademyAuthenticated ? <Academy /> : <Navigate to="/academy-login" replace />} 
-            />
-            <Route 
-              path="/quiz" 
-              element={isAcademyAuthenticated ? <Quiz /> : <Navigate to="/academy-login" replace />} 
-            />
-            
+            <Route path="/academy" element={<Academy />} />
+            <Route path="/quiz" element={<Quiz />} />
             {/* Ruta Protegida: Administrador */}
-            <Route 
-              path="/dashboard" 
-              element={isAuthenticated ? <Dashboard setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />} 
-            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute isAllowed={isAuthenticated}>
+                  <DashboardLayout setIsAuthenticated={setIsAuthenticated} />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="quotes/pending" element={<QuotesPending />} />
+              <Route path="quotes/sent" element={<QuotesSent />} />
+              <Route path="academy/courses" element={<AcademyCourses />} />
+              <Route path="academy/students" element={<AcademyStudents />} />
+              <Route path="academy/evaluations" element={<AcademyEvaluations />} />
+            </Route>
 
             {/* Ruta comodín */}
             <Route path="*" element={
