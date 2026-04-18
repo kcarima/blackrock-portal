@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { INITIAL_DATA } from './data/mockData.js';
 
 // Importación de Componentes Globales
+import { TopHeader } from './components/layout/TopHeader.jsx';
 import { Navbar } from './components/layout/Navbar.jsx';
 import { Footer } from './components/layout/Footer.jsx';
 // import { VirtualAssistant } from './components/ui/VirtualAssistant.jsx';
@@ -23,6 +24,8 @@ import { QuotesSent } from './pages/dashboard/QuotesSent.jsx';
 import { AcademyCourses } from './pages/dashboard/AcademyCourses.jsx';
 import { AcademyStudents } from './pages/dashboard/AcademyStudents.jsx';
 import { AcademyEvaluations } from './pages/dashboard/AcademyEvaluations.jsx';
+import { Projects } from './pages/Projects.jsx';
+import { ProjectDetails } from './pages/ProjectDetails.jsx';
 
 const ProtectedRoute = ({ isAllowed, redirectPath = '/login', children }) => {
   if (!isAllowed) {
@@ -69,12 +72,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="flex flex-col min-h-screen font-sans bg-gray-50 selection:bg-yellow-500 selection:text-black">
+        
+        <TopHeader company={appData.company} />
         <Navbar company={appData.company} />
         
-        <main className="flex-grow pt-24">
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home data={appData} />} />
             <Route path="/quote" element={<Quote />} />
+            <Route path="/projects" element={<Projects data={appData} />} />
+            <Route path="/projects/:projectId" element={<ProjectDetails data={appData} />} />
             
             {/* Rutas de Login */}
             <Route

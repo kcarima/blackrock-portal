@@ -16,8 +16,7 @@ export const HeroCarousel = ({ slides = [] }) => {
     <section className="relative bg-gray-900 text-white h-[85vh] min-h-[600px] overflow-hidden group">
       {slides.map((slide, idx) => (
         <div key={slide.id} className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
-          <img src={slide.img} alt={slide.title} className="w-full h-full object-cover opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/40 to-transparent"></div>
+          <img src={slide.img} alt={slide.title} className="w-full h-full object-cover opacity-100" />
           <div className="absolute inset-0 flex items-center">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
               <div className="max-w-3xl">
