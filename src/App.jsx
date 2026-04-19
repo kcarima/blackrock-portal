@@ -13,12 +13,24 @@ import { Footer } from './components/layout/Footer.jsx';
 // Importación de Páginas
 import { Home } from './pages/Home.jsx';
 import { Quote } from './pages/Quote.jsx';
+import { About } from './pages/About.jsx';
+import { Services } from './pages/Services.jsx';
+import { Team } from './pages/Team.jsx';
+import { TestimonialsPage } from './pages/TestimonialsPage.jsx';
+import { Earthwork } from './pages/Earthwork.jsx';
+import { Civil } from './pages/Civil.jsx';
+import { CommercialProjects } from './pages/CommercialProjects.jsx';
+import { Contact } from './pages/Contact.jsx';
 // import { AcademyLogin } from './pages/AcademyLogin.jsx'; // COMENTADO TEMPORALMENTE
 import { Academy } from './pages/Academy.jsx';
 import { Quiz } from './pages/Quiz.jsx';
 import { Login } from './pages/Login.jsx';
+import { AcademyLogin } from './pages/AcademyLogin.jsx';
 import { DashboardLayout } from './pages/dashboard/DashboardLayout.jsx';
 import { DashboardHome } from './pages/dashboard/DashboardHome.jsx';
+import { UsersManagement } from './pages/dashboard/UsersManagement.jsx';
+import { Inspections } from './pages/dashboard/Inspections.jsx';
+import { AcademyStudentDashboard } from './pages/dashboard/AcademyStudentDashboard.jsx';
 import { QuotesPending } from './pages/dashboard/QuotesPending.jsx';
 import { QuotesSent } from './pages/dashboard/QuotesSent.jsx';
 import { AcademyCourses } from './pages/dashboard/AcademyCourses.jsx';
@@ -26,6 +38,9 @@ import { AcademyStudents } from './pages/dashboard/AcademyStudents.jsx';
 import { AcademyEvaluations } from './pages/dashboard/AcademyEvaluations.jsx';
 import { Projects } from './pages/Projects.jsx';
 import { ProjectDetails } from './pages/ProjectDetails.jsx';
+import { ProjectGallery } from './pages/ProjectGallery.jsx';
+import { Progress } from './pages/Progress.jsx';
+import { ProgressLogin } from './pages/ProgressLogin.jsx';
 
 const ProtectedRoute = ({ isAllowed, redirectPath = '/login', children }) => {
   if (!isAllowed) {
@@ -40,11 +55,23 @@ export default function App() {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
 
+  const [authType, setAuthType] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('authType') || '';
+  });
+
+  const [userRole, setUserRole] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('userRole') || '';
+  });
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('isAuthenticated', isAuthenticated ? 'true' : 'false');
+      localStorage.setItem('authType', authType || '');
+      localStorage.setItem('userRole', userRole || '');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authType, userRole]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [appData, setAppData] = useState(null);
@@ -78,8 +105,19 @@ export default function App() {
         
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home data={appData} />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/empresa" element={<About />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/earthwork" element={<Earthwork />} />
+            <Route path="/civil" element={<Civil />} />
+            <Route path="/projects" element={<Projects data={appData} />} />
+            <Route path="/gallery" element={<ProjectGallery data={appData} />} />
+            <Route path="/commercial" element={<CommercialProjects />} />
+            <Route path="/projects/:projectId" element={<ProjectDetails data={appData} />} />
             <Route path="/quote" element={<Quote />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/projects" element={<Projects data={appData} />} />
             <Route path="/projects/:projectId" element={<ProjectDetails data={appData} />} />
             
@@ -87,30 +125,83 @@ export default function App() {
             <Route
               path="/login"
               element={
-                isAuthenticated ? (
+                isAuthenticated && authType === 'dashboard' ? (
                   <Navigate to="/dashboard" replace />
                 ) : (
-                  <Login setIsAuthenticated={setIsAuthenticated} />
+                  <Login
+                    setIsAuthenticated={setIsAuthenticated}
+                    setAuthType={setAuthType}
+                    setUserRole={setUserRole}
+                  />
                 )
+              }
+            />
+            <Route
+              path="/academy/login"
+              element={
+                isAuthenticated && authType === 'academy' ? (
+                  <Navigate to="/academy/dashboard" replace />
+                ) : (
+                  <AcademyLogin
+                    setIsAuthenticated={setIsAuthenticated}
+                    setAuthType={setAuthType}
+                    setUserRole={setUserRole}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/projects/avance/login"
+              element={
+                isAuthenticated && authType === 'client' ? (
+                  <Navigate to="/projects/avance" replace />
+                ) : (
+                  <ProgressLogin
+                    setIsAuthenticated={setIsAuthenticated}
+                    setAuthType={setAuthType}
+                    setUserRole={setUserRole}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/projects/avance"
+              element={
+                <Progress
+                  isClientAuthenticated={isAuthenticated && authType === 'client'}
+                  onLogout={() => {
+                    setIsAuthenticated(false);
+                    setAuthType('');
+                    setUserRole('');
+                  }}
+                />
               }
             />
             {/* Rutas Protegidas: Estudiantes de Academia */}
             <Route path="/academy" element={<Academy />} />
+            <Route path="/academy/dashboard" element={
+              <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
+                <AcademyStudentDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/quiz" element={<Quiz />} />
             {/* Ruta Protegida: Administrador */}
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute isAllowed={isAuthenticated}>
-                  <DashboardLayout setIsAuthenticated={setIsAuthenticated} />
+                <ProtectedRoute isAllowed={isAuthenticated && authType === 'dashboard'} redirectPath="/login">
+                  <DashboardLayout setIsAuthenticated={setIsAuthenticated} userRole={userRole} />
                 </ProtectedRoute>
               }
             >
+              <Route index element={userRole === 'Inspector' ? <Navigate to="inspections" replace /> : <DashboardHome />} />
               <Route path="quotes/pending" element={<QuotesPending />} />
               <Route path="quotes/sent" element={<QuotesSent />} />
               <Route path="academy/courses" element={<AcademyCourses />} />
               <Route path="academy/students" element={<AcademyStudents />} />
               <Route path="academy/evaluations" element={<AcademyEvaluations />} />
+              <Route path="users" element={<UsersManagement />} />
+              <Route path="inspections" element={<Inspections />} />
             </Route>
 
             {/* Ruta comodín */}

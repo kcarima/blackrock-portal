@@ -2,8 +2,10 @@ import React from 'react';
 import { HardHat, Building2, Wrench, FileText, ShieldCheck, CheckCircle2, ArrowRight, Home as HomeIcon, PenTool } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeroCarousel } from '../components/ui/HeroCarousel.jsx';
+import { INITIAL_DATA } from '../data/mockData.js';
 
-export const Home = ({ data }) => {
+export const Home = () => {
+  const data = INITIAL_DATA;
   const navigate = useNavigate();
   const renderIcon = (name) => {
     const icons = {
@@ -18,25 +20,12 @@ export const Home = ({ data }) => {
     return icons[name] || <CheckCircle2 size={32} />;
   };
 
-  const tsServices = [
-    { title: 'Construcción de viviendas', desc: 'Construcción de viviendas residenciales con los más altos estándares.', icon: 'Home' },
-    { title: 'Remodelaciones de edificios', desc: 'Remodelaciones comerciales e industriales con enfoque en calidad y plazo.', icon: 'Building2' },
-    { title: 'Diseño de interiores', desc: 'Diseño interior funcional y estético para transformar cualquier espacio.', icon: 'ts-service-box-img' },
-    { title: 'Diseño exterior', desc: 'Diseño exterior y paisajismo con soluciones modernas y duraderas.', icon: 'Wrench' },
-    { title: 'Renovación', desc: 'Renovaciones completas para actualizar infraestructuras existentes.', icon: 'HardHat' },
-    { title: 'Gestión de la seguridad', desc: 'Gestión de seguridad integral para obras libres de riesgos.', icon: 'ShieldCheck' },
-  ];
-
-  const leftServices = tsServices.slice(0, 3);
-  const rightServices = tsServices.slice(3);
+  const leftServices = data.tsServices.slice(0, 3);
+  const rightServices = data.tsServices.slice(3);
 
   const stats = data.stats;
 
-  const testimonials = [
-    { id: 1, name: 'Gabriel Denis', role: 'Chairman, OKT', quote: 'Excelente servicio y ejecución de obra. Nuestro proyecto se entregó a tiempo y con alta calidad.', img: data.company.logo2 },
-    { id: 2, name: 'Weldon Cash', role: 'CFO, First Choice', quote: 'Profesionales en cada fase del proyecto. Comunicación clara, entregables puntuales y soporte continuo.', img: data.company.logo },
-    { id: 3, name: 'Minter Puchan', role: 'Director, AKT', quote: 'Recomiendo BlackRock Guayana por su experiencia técnica y compromiso con la seguridad y el detalle.', img: data.company.logo2 },
-  ];
+  const testimonials = data.testimonials;
 
   return (
     <div className="animate-in fade-in duration-500 bg-gray-50 pb-0">
@@ -88,39 +77,39 @@ export const Home = ({ data }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="section-title text-3xl md:text-5xl font-extrabold text-gray-900">Somos especialistas en</h2>
-            <h3 className="section-sub-title text-xl text-gray-500 mt-4">Lo que hacemos</h3>
+            <h3 className="section-sub-title text-xl text-gray-700 mt-4">Lo que hacemos</h3>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-center">
             <div className="space-y-6">
               {leftServices.map((service, index) => (
-                <div key={index} className="ts-service-box flex gap-4 p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow bg-gray-50">
+                <div key={index} className="ts-service-box flex gap-4 p-6 rounded-3xl border border-gray-400 shadow-sm hover:shadow-lg transition-shadow bg-gray-50">
                   <div className="ts-service-box-img bg-yellow-50 text-yellow-600 w-16 h-16 rounded-3xl flex items-center justify-center">
                     {renderIcon(service.icon)}
                   </div>
                   <div className="ts-service-box-info">
                     <h3 className="service-box-title text-lg font-bold text-gray-900 mb-2">{service.title}</h3>
-                    <p className="text-gray-600">{service.desc}</p>
+                    <p className="text-gray-800">{service.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="hidden lg:flex items-center justify-center">
-              <div className="relative w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl">
-                <img src={data.heroSlides[0].img} alt="Service highlight" className="w-full h-full object-cover" />
+              <div className="relative w-full max-w-md h-54">
+                <img src={data.inspector} alt="Service highlight" className="w-full h-full object-cover" />
               </div>
             </div>
 
             <div className="space-y-6">
               {rightServices.map((service, index) => (
-                <div key={index} className="ts-service-box flex gap-4 p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow bg-gray-50">
+                <div key={index} className="ts-service-box flex gap-4 p-6 rounded-3xl border border-gray-400 shadow-sm hover:shadow-lg transition-shadow bg-gray-50">
                   <div className="ts-service-box-img bg-yellow-50 text-yellow-600 w-16 h-16 rounded-3xl flex items-center justify-center">
                     {renderIcon(service.icon)}
                   </div>
                   <div className="ts-service-box-info">
                     <h3 className="service-box-title text-lg font-bold text-gray-900 mb-2">{service.title}</h3>
-                    <p className="text-gray-600">{service.desc}</p>
+                    <p className="text-gray-800">{service.desc}</p>
                   </div>
                 </div>
               ))}

@@ -2,19 +2,30 @@ import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export const Login = ({ setIsAuthenticated }) => {
+export const Login = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const credentials = {
+    'admin@blackrock.com': { password: 'admin123', role: 'Administrador' },
+    'inspector@blackrock.com': { password: 'inspector123', role: 'Inspector' },
+    'analyst@blackrock.com': { password: 'analista123', role: 'Analista' },
+    'assistant@blackrock.com': { password: 'asistente123', role: 'Asistente' }
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
-    if (email === 'admin@blackrock.com' && password === 'admin123') {
+    const user = credentials[email.toLowerCase()];
+
+    if (user && user.password === password) {
       setIsAuthenticated(true);
+      setAuthType('dashboard');
+      setUserRole(user.role);
       navigate('/dashboard');
     } else {
-      setError('Credenciales incorrectas.');
+      setError('Credenciales incorrectas. Usa admin@blackrock.com, inspector@blackrock.com, analyst@blackrock.com o assistant@blackrock.com.');
     }
   };
 

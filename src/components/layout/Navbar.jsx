@@ -13,19 +13,23 @@ export const Navbar = () => {
     { 
       id: '/company', 
       label: 'Compañía',
-      subItems: [{ id: '/about', label: 'Nuestra Historia' }, { id: '/team', label: 'Nuestro Equipo' }]
+      subItems: [{ id: '/empresa', label: 'Nuestra Empresa' }, { id: '/team', label: 'Nuestro Equipo' }, { id: '/testimonials', label: 'Testimonios' }]
     },
     { 
       id: '/services', 
       label: 'Servicios',
-      subItems: [{ id: '/earthwork', label: 'Movimiento de Tierras' }, { id: '/civil', label: 'Obras Civiles' }]
+      subItems: [{ id: '/services', label: 'Todos los Servicios' }, { id: '/earthwork', label: 'Movimiento de Tierras' }, { id: '/civil', label: 'Obras Civiles' }]
     },
     { 
       id: '/projects', 
       label: 'Proyectos',
-      subItems: [{ id: '/industrial', label: 'Proyectos Industriales' }, { id: '/commercial', label: 'Proyectos Comerciales' }]
+      subItems: [
+        { id: '/projects', label: 'Todos los Proyectos' },
+        { id: '/gallery', label: 'Galería' },
+        { id: '/projects/avance', label: 'Avance' }
+      ]
     },
-    { id: '/academy', label: 'Academia' },
+    {id: '/academy', label: 'Academía'},
     { id: '/contact', label: 'Contactos' },
   ];
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GraduationCap, Lock, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export const AcademyLogin = ({ setIsAcademyAuthenticated }) => {
+export const AcademyLogin = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,12 +10,13 @@ export const AcademyLogin = ({ setIsAcademyAuthenticated }) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Credenciales suministradas por el administrador (Simulación)
-    if (email === 'estudiante@blackrock.com' && password === 'blackrock2024') {
-      setIsAcademyAuthenticated(true);
-      navigate('/academy');
+    if (email.toLowerCase() === 'estudiante@blackrock.com' && password === 'blackrock2024') {
+      setIsAuthenticated(true);
+      setAuthType('academy');
+      setUserRole('Estudiante');
+      navigate('/academy/dashboard');
     } else {
-      setError('Credenciales inválidas. Contacte al administrador.');
+      setError('Credenciales inválidas. Contacta al administrador para ingresar a la academia.');
     }
   };
 

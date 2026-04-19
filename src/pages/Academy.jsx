@@ -16,9 +16,14 @@ export const Academy = () => {
                 <div>
                   <h3 className="text-2xl font-bold text-yellow-500 mb-2">Módulo: Inspección y Control</h3>
                 </div>
-                <button onClick={() => navigate('/quiz')} className="bg-yellow-500 text-gray-900 px-6 py-3 rounded-lg font-bold flex items-center gap-2">
-                  <PenTool className="w-5 h-5"/> Presentar Prueba
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button onClick={() => navigate('/academy/login')} className="bg-yellow-500 text-gray-900 px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+                    <Award className="w-5 h-5"/> Ingresar a Academia
+                  </button>
+                  <button onClick={() => navigate('/quiz')} className="bg-gray-800 border border-yellow-500 text-yellow-500 px-6 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-yellow-500 hover:text-gray-900 transition-colors">
+                    <PenTool className="w-5 h-5"/> Presentar Prueba
+                  </button>
+                </div>
               </div>
             </div>
           </div>
