@@ -21,7 +21,7 @@ export const AcademyStudentDashboard = () => {
               <h1 className="mt-4 text-4xl font-extrabold text-gray-900">Mis cursos y pruebas</h1>
               <p className="mt-3 text-gray-500 max-w-2xl">Revisa tus cursos activos, los resultados de tus evaluaciones y el estado de tus oportunidades de prueba. La nota mínima aprobatoria es 80%.</p>
             </div>
-            <button onClick={() => navigate('/quiz')} className="inline-flex items-center gap-3 rounded-3xl bg-yellow-500 px-6 py-3 font-bold uppercase text-black hover:bg-yellow-400 transition">
+            <button onClick={() => navigate('/academy/quiz')} className="inline-flex items-center gap-3 rounded-3xl bg-yellow-500 px-6 py-3 font-bold uppercase text-black hover:bg-yellow-400 transition">
               <BookOpen size={18} /> Ir a la Prueba
             </button>
           </div>
@@ -81,7 +81,7 @@ export const AcademyStudentDashboard = () => {
                 <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <p className="text-sm text-gray-500">Para aprobar necesitas alcanzar 80% y no tener más de 3 intentos.</p>
                   <button
-                    onClick={() => navigate('/quiz')}
+                    onClick={() => navigate('/academy/quiz')}
                     disabled={!canAttempt}
                     className={`inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 font-bold transition ${canAttempt ? 'bg-yellow-500 text-black hover:bg-yellow-400' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
                   >

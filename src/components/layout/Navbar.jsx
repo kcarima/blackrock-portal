@@ -29,7 +29,7 @@ export const Navbar = () => {
         { id: '/projects/avance', label: 'Avance' }
       ]
     },
-    {id: '/academy', label: 'Academía'},
+    {id: '/academy/login', label: 'Academía'},
     { id: '/contact', label: 'Contactos' },
   ];
 

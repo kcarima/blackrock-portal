@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 // Importación de Datos
 import { INITIAL_DATA } from './data/mockData.js';
@@ -8,6 +8,7 @@ import { INITIAL_DATA } from './data/mockData.js';
 import { TopHeader } from './components/layout/TopHeader.jsx';
 import { Navbar } from './components/layout/Navbar.jsx';
 import { Footer } from './components/layout/Footer.jsx';
+import { AcademyLayout } from './components/layout/AcademyLayout.jsx';
 // import { VirtualAssistant } from './components/ui/VirtualAssistant.jsx';
 
 // Importación de Páginas
@@ -49,7 +50,7 @@ const ProtectedRoute = ({ isAllowed, redirectPath = '/login', children }) => {
   return children;
 };
 
-export default function App() {
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem('isAuthenticated') === 'true';
@@ -87,6 +88,15 @@ export default function App() {
     loadData();
   }, []);
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setAuthType('');
+    setUserRole('');
+    navigate('/');
+  };
+
   if (isLoading || !appData) {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
@@ -97,13 +107,10 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <div className="flex flex-col min-h-screen font-sans bg-gray-50 selection:bg-yellow-500 selection:text-black">
-        
-        <TopHeader company={appData.company} />
-        <Navbar company={appData.company} />
-        
-        <main className="flex-grow">
+    <div className="flex flex-col min-h-screen font-sans bg-gray-50 selection:bg-yellow-500 selection:text-black">
+      <TopHeader company={appData.company} />
+      <Navbar company={appData.company} />
+      <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/empresa" element={<About />} />
@@ -140,7 +147,7 @@ export default function App() {
               path="/academy/login"
               element={
                 isAuthenticated && authType === 'academy' ? (
-                  <Navigate to="/academy/dashboard" replace />
+                  <Navigate to="/academy" replace />
                 ) : (
                   <AcademyLogin
                     setIsAuthenticated={setIsAuthenticated}
@@ -178,13 +185,22 @@ export default function App() {
               }
             />
             {/* Rutas Protegidas: Estudiantes de Academia */}
-            <Route path="/academy" element={<Academy />} />
+            <Route path="/academy" element={
+              <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
+                <Academy setIsAuthenticated={setIsAuthenticated} setAuthType={setAuthType} setUserRole={setUserRole} />
+              </ProtectedRoute>
+            } />
             <Route path="/academy/dashboard" element={
               <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
                 <AcademyStudentDashboard />
               </ProtectedRoute>
             } />
-            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/academy/quiz" element={
+              <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
+                <Quiz onLogout={handleLogout} />
+              </ProtectedRoute>
+            } />
+            <Route path="/quiz" element={<Navigate to="/academy/quiz" replace />} />
             {/* Ruta Protegida: Administrador */}
             <Route
               path="/dashboard"
@@ -216,6 +232,13 @@ export default function App() {
         {/* <VirtualAssistant /> */}
         <Footer company={appData.company} />
       </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

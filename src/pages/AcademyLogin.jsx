@@ -14,7 +14,7 @@ export const AcademyLogin = ({ setIsAuthenticated, setAuthType, setUserRole }) =
       setIsAuthenticated(true);
       setAuthType('academy');
       setUserRole('Estudiante');
-      navigate('/academy/dashboard');
+      navigate('/academy');
     } else {
       setError('Credenciales inválidas. Contacta al administrador para ingresar a la academia.');
     }
