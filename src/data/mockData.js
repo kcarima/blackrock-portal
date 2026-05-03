@@ -208,7 +208,33 @@ export const INITIAL_DATA = {
       { id: 3, title: "Mantenimiento Preventivo", duration: "60 Horas", icon: "Wrench" }
     ],
     
-  }
+  },
+  team: [
+    {
+      id: 1,
+      name: "Juan Pérez",
+      role: "Director General",
+      experience: "15 años",
+      specialization: "Obras Civiles",
+      image: "/api/placeholder/300/300"
+    },
+    {
+      id: 2,
+      name: "María González",
+      role: "Jefa de Inspección",
+      experience: "12 años",
+      specialization: "Inspección de Obras",
+      image: "/api/placeholder/300/300"
+    },
+    {
+      id: 3,
+      name: "Carlos Rodríguez",
+      role: "Supervisor de Construcción",
+      experience: "10 años",
+      specialization: "Construcción Residencial",
+      image: "/api/placeholder/300/300"
+    }
+  ]
 };
 
 export const QUIZ_QUESTIONS = [

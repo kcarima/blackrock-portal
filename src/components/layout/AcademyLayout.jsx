@@ -3,7 +3,7 @@ import { AcademyTopHeader } from './AcademyTopHeader.jsx';
 import { AcademyFooter } from './AcademyFooter.jsx';
 
 export const AcademyLayout = ({ children, onLogout }) => (
-  <div className="min-h-screen bg-slate-50 text-gray-900">
+  <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col">
     <AcademyTopHeader onLogout={onLogout} />
     <main className="flex-grow"> 
       {children}

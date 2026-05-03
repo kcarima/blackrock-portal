@@ -7,7 +7,7 @@ export const TopHeader = ({ company }) => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex flex-col md:flex-row items-center gap-6">
             <Link to="/" className="flex items-center cursor-pointer">
-                <img src={company.logo} alt="BlackRock Logo" className="h-24 w-auto object-contain transition-transform hover:scale-105" />
+                <img src={company.logo} alt="BlackRock Logo" className="h-24 w-auto object-contain transition-transform hover:scale-120" />
             </Link>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ export const TopHeader = ({ company }) => (
             </a>
         </div>
         <Link to="/" className="hidden md:flex items-center cursor-pointer">
-                <img src={company.logo2} alt="BlackRock Logo" className="h-24 w-auto object-contain transition-transform hover:scale-105" />
+                <img src={company.logo2} alt="BlackRock Logo" className="h-24 w-auto object-contain transition-transform hover:scale-120" />
             </Link>
     </div>
   </div>

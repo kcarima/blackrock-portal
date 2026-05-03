@@ -115,7 +115,7 @@ export const DashboardLayout = ({ setIsAuthenticated, userRole }) => {
 
             {canManageUsers && (
               <li>
-                <Link to="#" className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-3 py-3 rounded-lg font-medium transition-colors">
+                <Link to="/dashboard/configuration" className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-3 py-3 rounded-lg font-medium transition-colors">
                   <Settings size={20} />
                   {isSidebarOpen && <span>Configuración</span>}
                 </Link>

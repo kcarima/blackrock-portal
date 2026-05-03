@@ -1,31 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Award, HardHat, Wrench } from 'lucide-react';
+import { INITIAL_DATA } from '../data/mockData.js';
 
 export const Team = () => {
-  // Placeholder data - in a real app, this would come from a database
-  const teamMembers = [
-    {
-      name: "Juan Pérez",
-      role: "Director General",
-      experience: "15 años",
-      specialization: "Obras Civiles",
-      image: "/api/placeholder/300/300"
-    },
-    {
-      name: "María González",
-      role: "Jefa de Inspección",
-      experience: "12 años",
-      specialization: "Inspección de Obras",
-      image: "/api/placeholder/300/300"
-    },
-    {
-      name: "Carlos Rodríguez",
-      role: "Supervisor de Construcción",
-      experience: "10 años",
-      specialization: "Construcción Residencial",
-      image: "/api/placeholder/300/300"
+  const [data, setData] = useState(INITIAL_DATA);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem('portalData');
+    if (savedData) {
+      setData(JSON.parse(savedData));
     }
-  ];
+  }, []);
+
+  const teamMembers = data.team;
 
   return (
     <div className="animate-in fade-in duration-500 bg-gray-50 pb-0">
@@ -56,7 +43,13 @@ export const Team = () => {
             {teamMembers.map((member, index) => (
               <div key={index} className="bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
                 <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-6 overflow-hidden">
-                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                  {member.image ? (
+                    <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <Users size={48} className="text-gray-400" />
+                    </div>
+                  )}
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{member.name}</h3>
                 <p className="text-yellow-600 font-semibold text-center mb-4">{member.role}</p>

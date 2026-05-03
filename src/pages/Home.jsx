@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { HardHat, Building2, Wrench, FileText, ShieldCheck, CheckCircle2, ArrowRight, Home as HomeIcon, PenTool } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeroCarousel } from '../components/ui/HeroCarousel.jsx';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const Home = () => {
-  const data = INITIAL_DATA;
+  const [data, setData] = useState(INITIAL_DATA);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem('portalData');
+    if (savedData) {
+      setData(JSON.parse(savedData));
+    }
+  }, []);
+
   const navigate = useNavigate();
   const renderIcon = (name) => {
     const icons = {

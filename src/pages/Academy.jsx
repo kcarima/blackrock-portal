@@ -26,13 +26,8 @@ export const Academy = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
         <div className="bg-white rounded-3xl p-8 mb-8 shadow-lg border border-gray-200">
           <div className="text-center">
             <h2 className="text-4xl font-extrabold text-gray-900 mb-4">¡Bienvenido a tu Academia!</h2>
-            <p className="text-xl text-gray-600 mb-6">Desarrolla tus habilidades profesionales con nuestros cursos especializados</p>
-            <div className="flex justify-center gap-4">
-              <button onClick={() => navigate('/academy/quiz')} className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl transition-colors flex items-center gap-2">
-                <BookOpen size={20} />
-                Presentar Prueba
-              </button>
-            </div>
+            <p className="text-xl text-black mb-6">Desarrolla tus habilidades profesionales con nuestros cursos especializados</p>
+            
           </div>
         </div>
 

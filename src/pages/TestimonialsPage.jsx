@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Quote } from 'lucide-react';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const TestimonialsPage = () => {
-  const { testimonials } = INITIAL_DATA;
+  const [data, setData] = useState(INITIAL_DATA);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem('portalData');
+    if (savedData) {
+      setData(JSON.parse(savedData));
+    }
+  }, []);
+
+  const { testimonials } = data;
 
   return (
     <div className="animate-in fade-in duration-500 bg-gray-50 pb-0">
@@ -30,7 +39,13 @@ export const TestimonialsPage = () => {
                 <p className="text-gray-700 leading-relaxed mb-6 text-justify">"{item.quote}"</p>
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden bg-white border border-gray-200">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                    {item.img ? (
+                      <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <Quote size={20} className="text-gray-400" />
+                      </div>
+                    )}
                   </div>
                   <div>
                     <p className="font-bold text-gray-900">{item.name}</p>

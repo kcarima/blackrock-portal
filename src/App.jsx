@@ -37,6 +37,7 @@ import { QuotesSent } from './pages/dashboard/QuotesSent.jsx';
 import { AcademyCourses } from './pages/dashboard/AcademyCourses.jsx';
 import { AcademyStudents } from './pages/dashboard/AcademyStudents.jsx';
 import { AcademyEvaluations } from './pages/dashboard/AcademyEvaluations.jsx';
+import { Configuration } from './pages/dashboard/Configuration.jsx';
 import { Projects } from './pages/Projects.jsx';
 import { ProjectDetails } from './pages/ProjectDetails.jsx';
 import { ProjectGallery } from './pages/ProjectGallery.jsx';
@@ -89,6 +90,8 @@ function AppContent() {
   }, []);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAcademy = location.pathname.startsWith('/academy');
 
   const handleLogout = () => {
     setIsAuthenticated(false);
@@ -103,6 +106,31 @@ function AppContent() {
         <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <div className="text-yellow-500 font-bold tracking-widest uppercase">Cargando Plataforma...</div>
       </div>
+    );
+  }
+
+  if (isAcademy) {
+    return (
+      <AcademyLayout onLogout={handleLogout}>
+        <Routes>
+          <Route path="/academy" element={
+            <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
+              <Academy setIsAuthenticated={setIsAuthenticated} setAuthType={setAuthType} setUserRole={setUserRole} />
+            </ProtectedRoute>
+          } />
+          <Route path="/academy/dashboard" element={
+            <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
+              <AcademyStudentDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/academy/quiz" element={
+            <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
+              <Quiz onLogout={handleLogout} />
+            </ProtectedRoute>
+          } />
+          <Route path="/quiz" element={<Navigate to="/academy/quiz" replace />} />
+        </Routes>
+      </AcademyLayout>
     );
   }
 
@@ -184,23 +212,6 @@ function AppContent() {
                 />
               }
             />
-            {/* Rutas Protegidas: Estudiantes de Academia */}
-            <Route path="/academy" element={
-              <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
-                <Academy setIsAuthenticated={setIsAuthenticated} setAuthType={setAuthType} setUserRole={setUserRole} />
-              </ProtectedRoute>
-            } />
-            <Route path="/academy/dashboard" element={
-              <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
-                <AcademyStudentDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/academy/quiz" element={
-              <ProtectedRoute isAllowed={isAuthenticated && authType === 'academy' && userRole === 'Estudiante'} redirectPath="/academy/login">
-                <Quiz onLogout={handleLogout} />
-              </ProtectedRoute>
-            } />
-            <Route path="/quiz" element={<Navigate to="/academy/quiz" replace />} />
             {/* Ruta Protegida: Administrador */}
             <Route
               path="/dashboard"
@@ -218,6 +229,7 @@ function AppContent() {
               <Route path="academy/evaluations" element={<AcademyEvaluations />} />
               <Route path="users" element={<UsersManagement />} />
               <Route path="inspections" element={<Inspections />} />
+              <Route path="configuration" element={<Configuration />} />
             </Route>
 
             {/* Ruta comodín */}
