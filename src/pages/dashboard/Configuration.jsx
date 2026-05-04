@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Eye, Save, Plus, Edit, Trash2, X } from 'lucide-react';
+import { apiService } from '../../services/apiService';
 import { INITIAL_DATA } from '../../data/mockData.js';
 
 export const Configuration = () => {
@@ -9,6 +10,7 @@ export const Configuration = () => {
   const [previewMode, setPreviewMode] = useState(false);
   const [previewTab, setPreviewTab] = useState('inicio');
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Estados para edición
   const [editingService, setEditingService] = useState(null);
@@ -17,17 +19,61 @@ export const Configuration = () => {
   const [editingAcademy, setEditingAcademy] = useState(null);
   const [editingCompany, setEditingCompany] = useState(null);
   const [editingTeamMember, setEditingTeamMember] = useState(null);
-  const [testimonialEdit, setTestimonialEdit] = useState({ name: '', role: '', quote: '', img: '' });
-  const [teamEdit, setTeamEdit] = useState({ name: '', role: '', experience: '', specialization: '', image: '' });
+  const [testimonialEdit, setTestimonialEdit] = useState({ name: '', role: '', quote: '', image_url: '' });
+  const [teamEdit, setTeamEdit] = useState({ name: '', role: '', experience: '', specialization: '', image_url: '' });
+  const [editingHeroSlide, setEditingHeroSlide] = useState(null);
+  const [heroSlideEdit, setHeroSlideEdit] = useState({ title: '', subtitle: '', image_url: '' });
+  const [editingFooter, setEditingFooter] = useState(false);
+  const [footerEdit, setFooterEdit] = useState({ copyright: '', socialLinks: [] });
 
   useEffect(() => {
-    // Cargar datos desde localStorage si existen
-    const savedData = localStorage.getItem('portalData');
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setData(parsedData);
-      setPublishedData(parsedData);
-    }
+    const loadData = async () => {
+      try {
+        const [
+          companyData,
+          servicesData,
+          specialtiesData,
+          testimonialsData,
+          teamData,
+          academyData
+        ] = await Promise.all([
+          apiService.getCompany(),
+          apiService.getServices(),
+          apiService.getSpecialties(),
+          apiService.getTestimonials(),
+          apiService.getTeam(),
+          apiService.getAcademy()
+        ]);
+
+        const newData = { ...INITIAL_DATA };
+
+        if (companyData) newData.company = companyData;
+        if (servicesData) newData.services = servicesData;
+        if (specialtiesData) newData.specialties = specialtiesData;
+        if (testimonialsData) newData.testimonials = testimonialsData;
+        if (teamData) newData.team = teamData;
+        if (academyData) {
+          newData.academy = academyData.academy || INITIAL_DATA.academy;
+          newData.academy.courses = academyData.courses || INITIAL_DATA.academy.courses;
+        }
+
+        setData(newData);
+        setPublishedData(newData);
+      } catch (error) {
+        console.error('Error loading data from API:', error);
+        // Fallback to localStorage if API fails
+        const savedData = localStorage.getItem('portalData');
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          setData(parsedData);
+          setPublishedData(parsedData);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const updateData = (newData) => {
@@ -95,7 +141,7 @@ export const Configuration = () => {
   };
 
   const addTestimonial = () => {
-    setTestimonialEdit({ name: '', role: '', quote: '', img: '' });
+    setTestimonialEdit({ name: '', role: '', quote: '', image_url: '' });
     setEditingTestimonial(-1);
   };
 
@@ -112,8 +158,35 @@ export const Configuration = () => {
   };
 
   const addTeamMember = () => {
-    setTeamEdit({ name: '', role: '', experience: '', specialization: '', image: '' });
+    setTeamEdit({ name: '', role: '', experience: '', specialization: '', image_url: '' });
     setEditingTeamMember(-1);
+  };
+
+  // Funciones CRUD para Carrusel
+  const handleDeleteHeroSlide = (index) => {
+    const newSlides = data.heroSlides.filter((_, i) => i !== index);
+    updateData({ ...data, heroSlides: newSlides });
+  };
+
+  const handleSaveHeroSlide = () => {
+    const newSlides = [...data.heroSlides];
+    if (editingHeroSlide === -1) {
+      // Agregar nuevo slide
+      newSlides.push(heroSlideEdit);
+    } else {
+      // Editar slide existente
+      newSlides[editingHeroSlide] = heroSlideEdit;
+    }
+    updateData({ ...data, heroSlides: newSlides });
+    setEditingHeroSlide(null);
+    setHeroSlideEdit({ title: '', subtitle: '', image_url: '' });
+  };
+
+  // Funciones CRUD para Footer
+  const handleSaveFooter = () => {
+    updateData({ ...data, footer: footerEdit });
+    setEditingFooter(false);
+    setFooterEdit({ copyright: '', socialLinks: [] });
   };
 
   // Modal de edición para Servicios
@@ -196,16 +269,16 @@ export const Configuration = () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleImageUpload(e, (result) => setTestimonialEdit({ ...testimonialEdit, img: result }))}
+                onChange={(e) => handleImageUpload(e, (result) => setTestimonialEdit({ ...testimonialEdit, image_url: result }))}
                 className="w-full p-3 border rounded"
               />
-              {testimonialEdit.img && (
-                <img src={testimonialEdit.img} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded" />
+              {testimonialEdit.image_url && (
+                <img src={testimonialEdit.image_url} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded" />
               )}
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => { setEditingTestimonial(null); setTestimonialEdit({ name: '', role: '', quote: '', img: '' }); }} className="px-4 py-2 bg-gray-500 text-white rounded">Cancelar</button>
+              <button onClick={() => { setEditingTestimonial(null); setTestimonialEdit({ name: '', role: '', quote: '', image_url: '' }); }} className="px-4 py-2 bg-gray-500 text-white rounded">Cancelar</button>
             <button onClick={() => {
               if (isAdding) {
                 updateData({ ...data, testimonials: [...data.testimonials, testimonialEdit] });
@@ -213,12 +286,12 @@ export const Configuration = () => {
                 updateTestimonial(editingTestimonial, 'name', testimonialEdit.name);
                 updateTestimonial(editingTestimonial, 'role', testimonialEdit.role);
                 updateTestimonial(editingTestimonial, 'quote', testimonialEdit.quote);
-                if (testimonialEdit.img) {
-                  updateTestimonial(editingTestimonial, 'img', testimonialEdit.img);
+                if (testimonialEdit.image_url) {
+                  updateTestimonial(editingTestimonial, 'image_url', testimonialEdit.image_url);
                 }
               }
               setEditingTestimonial(null);
-              setTestimonialEdit({ name: '', role: '', quote: '', img: '' });
+              setTestimonialEdit({ name: '', role: '', quote: '', image_url: '' });
             }} className="px-4 py-2 bg-blue-500 text-white rounded">Guardar</button>
           </div>
         </div>
@@ -273,7 +346,7 @@ export const Configuration = () => {
                 className="w-full p-3 border rounded"
               />
               {teamEdit.image && (
-                <img src={teamEdit.image} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded" />
+                <img src={teamEdit.image_url} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded" />
               )}
             </div>
           </div>
@@ -294,6 +367,90 @@ export const Configuration = () => {
               setEditingTeamMember(null);
               setTeamEdit({ name: '', role: '', experience: '', specialization: '', image: '' });
             }} className="px-4 py-2 bg-blue-500 text-white rounded">Guardar</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderHeroSlideModal = () => {
+    if (editingHeroSlide === null) return null;
+    const isAdding = editingHeroSlide === -1;
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <h3 className="text-xl font-bold mb-4">{isAdding ? 'Agregar' : 'Editar'} Slide del Carrusel</h3>
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={heroSlideEdit.title}
+              onChange={(e) => setHeroSlideEdit({ ...heroSlideEdit, title: e.target.value })}
+              className="w-full p-3 border rounded"
+              placeholder="Título del slide"
+            />
+            <input
+              type="text"
+              value={heroSlideEdit.subtitle}
+              onChange={(e) => setHeroSlideEdit({ ...heroSlideEdit, subtitle: e.target.value })}
+              className="w-full p-3 border rounded"
+              placeholder="Subtítulo del slide"
+            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Imagen</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, (result) => setHeroSlideEdit({ ...heroSlideEdit, image_url: result }))}
+                className="w-full p-3 border rounded"
+              />
+              {heroSlideEdit.image_url && (
+                <img src={heroSlideEdit.image_url} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded" />
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <button onClick={() => { setEditingHeroSlide(null); setHeroSlideEdit({ title: '', subtitle: '', image_url: '' }); }} className="px-4 py-2 bg-gray-500 text-white rounded">Cancelar</button>
+            <button onClick={handleSaveHeroSlide} className="px-4 py-2 bg-blue-500 text-white rounded">Guardar</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderFooterModal = () => {
+    if (!editingFooter) return null;
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <h3 className="text-xl font-bold mb-4">Editar Footer</h3>
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={footerEdit.copyright || data.footer?.copyright || ''}
+              onChange={(e) => setFooterEdit({ ...footerEdit, copyright: e.target.value })}
+              className="w-full p-3 border rounded"
+              placeholder="Texto de copyright"
+            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Enlaces de Redes Sociales (JSON)</label>
+              <textarea
+                value={JSON.stringify(footerEdit.socialLinks || data.footer?.socialLinks || [], null, 2)}
+                onChange={(e) => {
+                  try {
+                    const links = JSON.parse(e.target.value);
+                    setFooterEdit({ ...footerEdit, socialLinks: links });
+                  } catch (error) {
+                    // Invalid JSON, keep current value
+                  }
+                }}
+                className="w-full p-3 border rounded h-32"
+                placeholder='[{"platform": "Facebook", "url": "https://facebook.com/page"}, {"platform": "Instagram", "url": "https://instagram.com/user"}]'
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <button onClick={() => { setEditingFooter(false); setFooterEdit({ copyright: '', socialLinks: [] }); }} className="px-4 py-2 bg-gray-500 text-white rounded">Cancelar</button>
+            <button onClick={handleSaveFooter} className="px-4 py-2 bg-blue-500 text-white rounded">Guardar</button>
           </div>
         </div>
       </div>
@@ -370,8 +527,8 @@ export const Configuration = () => {
           {data.testimonials.map((testimonial, index) => (
             <div key={index} className="border p-4 rounded flex justify-between items-center">
               <div className="flex items-center gap-4">
-                {testimonial.img && (
-                  <img src={testimonial.img} alt={testimonial.name} className="w-12 h-12 object-cover rounded-full" />
+                {testimonial.image_url && (
+                  <img src={testimonial.image_url} alt={testimonial.name} className="w-12 h-12 object-cover rounded-full" />
                 )}
                 <div>
                   <p>"{testimonial.quote}"</p>
@@ -520,6 +677,75 @@ export const Configuration = () => {
     </div>
   );
 
+  const renderCarruselTab = () => (
+    <div className="space-y-8">
+      <h3 className="text-2xl font-bold text-gray-900">Carrusel de Inicio</h3>
+
+      {/* Lista de Slides */}
+      <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-xl font-semibold">Slides del Carrusel</h4>
+          <button onClick={() => { setHeroSlideEdit({ title: '', subtitle: '', image_url: '' }); setEditingHeroSlide(-1); }} className="flex items-center gap-2 bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+            <Plus size={14} /> Agregar Slide
+          </button>
+        </div>
+        <div className="space-y-4">
+          {data.heroSlides.map((slide, index) => (
+            <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-4">
+                <img src={slide.image_url || '/api/placeholder/100/60'} alt={slide.title} className="w-16 h-10 object-cover rounded" />
+                <div>
+                  <h5 className="font-semibold">{slide.title}</h5>
+                  <p className="text-sm text-gray-600">{slide.subtitle}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { setHeroSlideEdit(slide); setEditingHeroSlide(index); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded">
+                  <Edit size={16} />
+                </button>
+                <button onClick={() => handleDeleteHeroSlide(index)} className="p-2 text-red-600 hover:bg-red-50 rounded">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderFooterTab = () => (
+    <div className="space-y-8">
+      <h3 className="text-2xl font-bold text-gray-900">Configuración del Footer</h3>
+
+      {/* Información del Footer */}
+      <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-xl font-semibold">Información del Footer</h4>
+          <button onClick={() => setEditingFooter(true)} className="flex items-center gap-2 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+            <Edit size={14} /> Editar Footer
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Copyright</label>
+            <p className="text-gray-900">{data.footer?.copyright || '© 2026 BlackRock Guayana C.A. Todos los derechos reservados.'}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Enlaces de Redes Sociales</label>
+            <div className="flex gap-4">
+              {data.footer?.socialLinks?.map((link, index) => (
+                <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  {link.platform}
+                </a>
+              )) || <p className="text-gray-500">No hay enlaces configurados</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   // La vista previa ahora se renderiza como overlay, de modo que al cerrarla vuelve al editor sin problemas.
 
   return (
@@ -578,8 +804,8 @@ export const Configuration = () => {
                     <h3 className="text-2xl font-bold mb-4">Testimonios</h3>
                     {data.testimonials.map((testimonial, index) => (
                       <div key={index} className="border p-4 rounded mb-4 flex items-center gap-4">
-                        {testimonial.img && (
-                          <img src={testimonial.img} alt={testimonial.name} className="w-16 h-16 object-cover rounded-full" />
+                        {testimonial.image_url && (
+                          <img src={testimonial.image_url} alt={testimonial.name} className="w-16 h-16 object-cover rounded-full" />
                         )}
                         <div>
                           <p>"{testimonial.quote}"</p>
@@ -609,7 +835,7 @@ export const Configuration = () => {
                       {data.team.map((member, index) => (
                         <div key={index} className="border p-4 rounded flex items-center gap-4">
                           {member.image && (
-                            <img src={member.image} alt={member.name} className="w-16 h-16 object-cover rounded-full" />
+                            <img src={member.image_url} alt={member.name} className="w-16 h-16 object-cover rounded-full" />
                           )}
                           <div>
                             <h4 className="font-semibold">{member.name}</h4>
@@ -642,7 +868,7 @@ export const Configuration = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {data.portfolio.slice(0, 8).map((item, index) => (
                         <div key={index} className="border p-2 rounded">
-                          <img src={item.img} alt={item.title} className="w-full h-24 object-cover rounded" />
+                          <img src={item.image_url} alt={item.title} className="w-full h-24 object-cover rounded" />
                           <p className="text-sm mt-2">{item.title}</p>
                         </div>
                       ))}
@@ -661,7 +887,9 @@ export const Configuration = () => {
           {[
             { id: 'inicio', label: 'Inicio' },
             { id: 'compania', label: 'Compañía' },
-            { id: 'proyecto', label: 'Proyecto' }
+            { id: 'proyecto', label: 'Proyecto' },
+            { id: 'carrusel', label: 'Carrusel' },
+            { id: 'footer', label: 'Footer' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -683,12 +911,16 @@ export const Configuration = () => {
         {activeTab === 'inicio' && renderInicioTab()}
         {activeTab === 'compania' && renderCompaniaTab()}
         {activeTab === 'proyecto' && renderProyectoTab()}
+        {activeTab === 'carrusel' && renderCarruselTab()}
+        {activeTab === 'footer' && renderFooterTab()}
       </div>
 
       {/* Modales */}
       {renderServiceModal()}
       {renderTestimonialModal()}
       {renderTeamModal()}
+      {renderHeroSlideModal()}
+      {renderFooterModal()}
     </div>
   );
 };

@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
 import { LogIn, Lock, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiService } from '../services/apiService';
 
 export const ProgressLogin = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email.toLowerCase() === 'cliente@blackrock.com' && password === 'avance123') {
-      setIsAuthenticated(true);
-      setAuthType('client');
-      setUserRole('Cliente');
-      navigate('/projects/avance');
-    } else {
-      setError('Usuario o contraseña incorrectos para el acceso de avance.');
+    setLoading(true);
+    setError('');
+
+    try {
+      const userData = await apiService.login(email, password);
+
+      if (userData && userData.role === 'Cliente') {
+        setIsAuthenticated(true);
+        setAuthType('client');
+        setUserRole(userData.role);
+        navigate('/projects/avance');
+      } else {
+        setError('Usuario o contraseña incorrectos para el acceso de avance.');
+      }
+    } catch (error) {
+      console.error('Progress login error:', error);
+      setError(error?.message || 'Error al iniciar sesión. Intente nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,8 +72,8 @@ export const ProgressLogin = ({ setIsAuthenticated, setAuthType, setUserRole }) 
             </div>
           </div>
           {error && <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-xl">{error}</div>}
-          <button type="submit" className="w-full rounded-3xl bg-yellow-500 px-5 py-3 text-black font-bold hover:bg-yellow-400 transition inline-flex items-center justify-center gap-2">
-            <LogIn className="w-5 h-5" /> Iniciar Sesión
+          <button type="submit" disabled={loading} className="w-full rounded-3xl bg-yellow-500 px-5 py-3 text-black font-bold hover:bg-yellow-400 transition inline-flex items-center justify-center gap-2 disabled:opacity-50">
+            {loading ? 'Iniciando...' : <><LogIn className="w-5 h-5" /> Iniciar Sesión</>}
           </button>
         </form>
       </div>

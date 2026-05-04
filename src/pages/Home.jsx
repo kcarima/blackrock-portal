@@ -2,16 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { HardHat, Building2, Wrench, FileText, ShieldCheck, CheckCircle2, ArrowRight, Home as HomeIcon, PenTool } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeroCarousel } from '../components/ui/HeroCarousel.jsx';
+import { apiService } from '../services/apiService';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const Home = () => {
   const [data, setData] = useState(INITIAL_DATA);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedData = localStorage.getItem('portalData');
-    if (savedData) {
-      setData(JSON.parse(savedData));
-    }
+    const loadData = async () => {
+      try {
+        const [companyData, servicesData, testimonialsData] = await Promise.all([
+          apiService.getCompany(),
+          apiService.getServices(),
+          apiService.getTestimonials()
+        ]);
+
+        if (companyData || servicesData || testimonialsData) {
+          setData(prevData => ({
+            ...prevData,
+            company: companyData || prevData.company,
+            services: servicesData || prevData.services,
+            testimonials: testimonialsData || prevData.testimonials
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading data from API:', error);
+        // Fallback to localStorage if API fails
+        const savedData = localStorage.getItem('portalData');
+        if (savedData) {
+          setData(JSON.parse(savedData));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const navigate = useNavigate();
@@ -145,7 +172,7 @@ export const Home = () => {
           {data.projects.map(project => (
             <Link key={project.id} to={`/projects/${project.id}`} className="group relative overflow-hidden rounded-xl bg-gray-800 cursor-pointer block">
               <img 
-                src={project.img} 
+                src={project.image_url} 
                 alt={project.title} 
                 className="w-full h-80 object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-80 group-hover:opacity-100" 
               />
@@ -185,7 +212,7 @@ export const Home = () => {
                 <p className="text-gray-700 leading-relaxed mb-6">“{item.quote}”</p>
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden bg-white border border-gray-200">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <p className="font-bold text-gray-900">{item.name}</p>

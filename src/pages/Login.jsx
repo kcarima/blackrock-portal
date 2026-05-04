@@ -1,31 +1,37 @@
 import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiService } from '../services/apiService';
 
 export const Login = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const credentials = {
-    'admin@blackrock.com': { password: 'admin123', role: 'Administrador' },
-    'inspector@blackrock.com': { password: 'inspector123', role: 'Inspector' },
-    'analyst@blackrock.com': { password: 'analista123', role: 'Analista' },
-    'assistant@blackrock.com': { password: 'asistente123', role: 'Asistente' }
-  };
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const user = credentials[email.toLowerCase()];
+    setLoading(true);
+    setError('');
 
-    if (user && user.password === password) {
-      setIsAuthenticated(true);
-      setAuthType('dashboard');
-      setUserRole(user.role);
-      navigate('/dashboard');
-    } else {
-      setError('Credenciales incorrectas. Usa admin@blackrock.com, inspector@blackrock.com, analyst@blackrock.com o assistant@blackrock.com.');
+    try {
+      const userData = await apiService.login(email, password);
+      const allowedDashboardRoles = ['Administrador', 'Inspector', 'Analista', 'Asistente'];
+
+      if (userData && allowedDashboardRoles.includes(userData.role)) {
+        setIsAuthenticated(true);
+        setAuthType('dashboard');
+        setUserRole(userData.role);
+        navigate('/dashboard');
+      } else {
+        setError('Credenciales incorrectas o sin permiso para acceder al panel.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error?.message || 'Error al iniciar sesión. Intente nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,7 +45,9 @@ export const Login = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
           <input type="email" required className="w-full p-3 border rounded-lg bg-gray-50" placeholder="admin@blackrock.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           <input type="password" required className="w-full p-3 border rounded-lg bg-gray-50" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
           {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-          <button type="submit" className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg"><LogIn className="inline w-5 h-5" /> Iniciar Sesión</button>
+          <button type="submit" disabled={loading} className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg disabled:opacity-50">
+            {loading ? 'Iniciando sesión...' : <><LogIn className="inline w-5 h-5" /> Iniciar Sesión</>}
+          </button>
         </form>
       </div>
     </div>

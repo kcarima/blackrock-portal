@@ -48,7 +48,7 @@ export const ProjectGallery = ({ data }) => {
             {filteredProjects.map((project) => (
               <div key={project.id} className="group block overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl">
                 <div className="relative overflow-hidden">
-                  <img src={project.img} alt={project.title} className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img src={project.image_url || project.img} alt={project.title} className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
                     <span className="text-white font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       Ver Proyecto

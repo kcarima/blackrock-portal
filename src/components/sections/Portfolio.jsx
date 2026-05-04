@@ -20,7 +20,7 @@ export const Portfolio = ({ projects = [] }) => (
         {projects.map(project => (
           <div key={project.id} className="group relative overflow-hidden rounded-xl bg-gray-800 cursor-pointer">
             <img 
-              src={project.img} 
+              src={project.image_url || project.img} 
               alt={project.title} 
               className="w-full h-80 object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-80 group-hover:opacity-100" 
             />

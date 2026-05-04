@@ -1,22 +1,37 @@
 import React, { useState } from 'react';
 import { GraduationCap, Lock, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiService } from '../services/apiService';
 
 export const AcademyLogin = ({ setIsAuthenticated, setAuthType, setUserRole }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email.toLowerCase() === 'estudiante@blackrock.com' && password === 'blackrock2024') {
-      setIsAuthenticated(true);
-      setAuthType('academy');
-      setUserRole('Estudiante');
-      navigate('/academy');
-    } else {
-      setError('Credenciales inválidas. Contacta al administrador para ingresar a la academia.');
+    setLoading(true);
+    setError('');
+
+    try {
+      const userData = await apiService.login(email, password);
+      const allowedAcademyRoles = ['Estudiante'];
+
+      if (userData && allowedAcademyRoles.includes(userData.role)) {
+        setIsAuthenticated(true);
+        setAuthType('academy');
+        setUserRole(userData.role);
+        navigate('/academy');
+      } else {
+        setError('Credenciales inválidas o sin acceso a la academia.');
+      }
+    } catch (error) {
+      console.error('Academy login error:', error);
+      setError(error?.message || 'Error al iniciar sesión. Intente nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +59,9 @@ export const AcademyLogin = ({ setIsAuthenticated, setAuthType, setUserRole }) =
             </div>
           </div>
           {error && <div className="text-red-600 text-sm text-center font-medium bg-red-50 p-2 rounded">{error}</div>}
-          <button type="submit" className="w-full bg-yellow-500 text-black hover:bg-yellow-400 font-bold py-3 rounded-lg transition-colors">Ingresar a Clases</button>
+          <button type="submit" disabled={loading} className="w-full bg-yellow-500 text-black hover:bg-yellow-400 font-bold py-3 rounded-lg transition-colors disabled:opacity-50">
+            {loading ? 'Ingresando...' : 'Ingresar a Clases'}
+          </button>
         </form>
       </div>
     </div>

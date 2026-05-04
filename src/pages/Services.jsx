@@ -1,9 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, Wrench, Building, Zap, Droplets, Paintbrush, TreePine, HardHat } from 'lucide-react';
+import { apiService } from '../services/apiService';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const Services = () => {
-  const { servicesDescription, servicesList } = INITIAL_DATA;
+  const [servicesDescription, setServicesDescription] = useState(INITIAL_DATA.servicesDescription);
+  const [servicesList, setServicesList] = useState(INITIAL_DATA.servicesList);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const servicesData = await apiService.getServices();
+        if (servicesData) {
+          setServicesDescription(servicesData.servicesDescription || INITIAL_DATA.servicesDescription);
+          setServicesList(servicesData.servicesList || INITIAL_DATA.servicesList);
+        }
+      } catch (error) {
+        console.error('Error loading services from API:', error);
+        // Fallback to localStorage if API fails
+        const savedData = localStorage.getItem('portalData');
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          setServicesDescription(parsedData.servicesDescription || INITIAL_DATA.servicesDescription);
+          setServicesList(parsedData.servicesList || INITIAL_DATA.servicesList);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const getIcon = (service) => {
     const iconMap = {
@@ -30,6 +58,14 @@ export const Services = () => {
 
   return (
     <div className="animate-in fade-in duration-500 bg-gray-50 pb-0">
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div>
+            <p className="text-center mt-4">Cargando servicios...</p>
+          </div>
+        </div>
+      )}
       {/* Hero Section */}
       <section className="py-24 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

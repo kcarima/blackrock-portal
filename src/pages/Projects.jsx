@@ -22,7 +22,7 @@ export const Projects = ({ data }) => {
             {data.projects.map((project) => (
               <Link key={project.id} to={`/projects/${project.id}`} className="group block overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl">
                 <div className="relative overflow-hidden">
-                  <img src={project.img} alt={project.title} className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img src={project.image_url || project.img} alt={project.title} className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105" />
                 </div>
                 <div className="p-8">
                   <span className="inline-flex items-center rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.3em] text-yellow-600">{project.category}</span>

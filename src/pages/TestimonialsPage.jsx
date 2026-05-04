@@ -1,15 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Quote } from 'lucide-react';
+import { apiService } from '../services/apiService';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const TestimonialsPage = () => {
   const [data, setData] = useState(INITIAL_DATA);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedData = localStorage.getItem('portalData');
-    if (savedData) {
-      setData(JSON.parse(savedData));
-    }
+    const loadData = async () => {
+      try {
+        const testimonialsData = await apiService.getTestimonials();
+        if (testimonialsData) {
+          setData(prevData => ({
+            ...prevData,
+            testimonials: testimonialsData
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading testimonials data from API:', error);
+        // Fallback to localStorage if API fails
+        const savedData = localStorage.getItem('portalData');
+        if (savedData) {
+          setData(JSON.parse(savedData));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const { testimonials } = data;
@@ -39,8 +59,8 @@ export const TestimonialsPage = () => {
                 <p className="text-gray-700 leading-relaxed mb-6 text-justify">"{item.quote}"</p>
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden bg-white border border-gray-200">
-                    {item.img ? (
-                      <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-200">
                         <Quote size={20} className="text-gray-400" />

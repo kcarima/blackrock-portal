@@ -1,13 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Building, ArrowRight } from 'lucide-react';
+import { apiService } from '../services/apiService';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const CommercialProjects = () => {
-  const { projects } = INITIAL_DATA;
+  const [projects, setProjects] = useState(INITIAL_DATA.projects);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const projectsData = await apiService.getProjects();
+        if (projectsData) {
+          setProjects(projectsData);
+        }
+      } catch (error) {
+        console.error('Error loading projects from API:', error);
+        // Fallback to localStorage if API fails
+        const savedData = localStorage.getItem('portalData');
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          setProjects(parsedData.projects || INITIAL_DATA.projects);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
   const commercialProjects = projects.filter(project => project.category === 'Comercial');
 
   return (
     <div className="animate-in fade-in duration-500 bg-gray-50 pb-0">
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div>
+            <p className="text-center mt-4">Cargando proyectos...</p>
+          </div>
+        </div>
+      )}
       {/* Hero Section */}
       <section className="py-24 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -35,7 +69,7 @@ export const CommercialProjects = () => {
             {commercialProjects.map(project => (
               <div key={project.id} className="bg-gray-50 rounded-2xl shadow-lg overflow-hidden group cursor-pointer">
                 <img 
-                  src={project.img} 
+                  src={project.image_url || project.img} 
                   alt={project.title} 
                   className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                 />

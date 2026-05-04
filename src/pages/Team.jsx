@@ -1,15 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Award, HardHat, Wrench } from 'lucide-react';
+import { apiService } from '../services/apiService';
 import { INITIAL_DATA } from '../data/mockData.js';
 
 export const Team = () => {
   const [data, setData] = useState(INITIAL_DATA);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedData = localStorage.getItem('portalData');
-    if (savedData) {
-      setData(JSON.parse(savedData));
-    }
+    const loadData = async () => {
+      try {
+        const teamData = await apiService.getTeam();
+        if (teamData) {
+          setData(prevData => ({
+            ...prevData,
+            team: teamData
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading team data from API:', error);
+        // Fallback to localStorage if API fails
+        const savedData = localStorage.getItem('portalData');
+        if (savedData) {
+          setData(JSON.parse(savedData));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const teamMembers = data.team;

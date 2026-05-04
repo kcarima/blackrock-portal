@@ -61,7 +61,7 @@ export const ProjectDetails = ({ data }) => {
 
             <aside className="space-y-6 rounded-3xl bg-gray-900 p-8 text-white shadow-2xl">
               <div className="rounded-3xl overflow-hidden border border-white/10 shadow-xl">
-                <img src={project.img} alt={project.title} className="w-full h-96 object-cover" />
+                <img src={project.image_url || project.img} alt={project.title} className="w-full h-96 object-cover" />
               </div>
               <div className="space-y-4">
                 <div className="rounded-3xl bg-white/5 p-6">
